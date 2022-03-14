@@ -17,8 +17,9 @@ lazy_static::lazy_static! {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
-    let url = "http://192.168.178.11:8083/";
-    let times = 10_000;
+    // let url = "http://192.168.178.11:8083/";
+    let url = "https://ascella.wtf/v2/ascella/view/zBNwf9q";
+    let times = 5000;
     let started = Instant::now();
 
     let (success, failed) = (Arc::new(Mutex::new(0)), Arc::new(Mutex::new(0)));
