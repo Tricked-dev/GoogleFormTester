@@ -1,3 +1,4 @@
+use clap::Parser;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::*;
 use futures::{stream, StreamExt};
@@ -7,21 +8,37 @@ use std::{
 };
 use tracing::debug;
 
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
+struct Cli {
+    #[clap(short, long)]
+    /// url to test on
+    url: String,
+
+    #[clap(short, long, default_value_t = 5000)]
+    /// Amount of times to test
+    times: usize,
+
+    #[clap(short, long, default_value_t = 8)]
+    // Thread count
+    threads: usize,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let cli = Cli::parse();
+    println!("[-] fetching {} for {} times", cli.url, cli.times);
     tracing_subscriber::fmt::init();
     let client = reqwest::Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36")
         .build()
         .unwrap();
 
-    let url = "https://ascella.wtf/v2/ascella/view/zBNwf9q";
-    let times = 5000;
     let started = Instant::now();
 
     let (success, failed) = (Arc::new(Mutex::new(0)), Arc::new(Mutex::new(0)));
 
-    let urls = vec![url; times];
+    let urls = vec![cli.url; cli.times];
     let bodies = stream::iter(urls)
         .map(|url| {
             let client = &client;
@@ -42,7 +59,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
             }
         })
-        .buffer_unordered(10);
+        .buffer_unordered(cli.threads);
 
     bodies.for_each(|_| async {}).await;
 
