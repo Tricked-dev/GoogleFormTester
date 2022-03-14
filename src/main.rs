@@ -3,6 +3,7 @@ use humantime::format_duration;
 use hyper::Client;
 use hyper_tls::HttpsConnector;
 use std::iter;
+use std::thread;
 use std::{sync::Arc, time::Instant};
 
 #[tokio::main(flavor = "current_thread")]
@@ -20,7 +21,7 @@ async fn start() -> Result<(), Box<dyn std::error::Error>> {
     future::join_all(iter::repeat(0).take(times).map(|_| {
         let client = client.clone();
         async move {
-            println!("Starting req");
+            println!("Starting req thread: {:?}", thread::current().id());
             let r = &client.get(url.parse().unwrap()).await.unwrap();
             println!("Ending req {}", r.status());
         }
