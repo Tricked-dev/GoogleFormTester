@@ -1,45 +1,51 @@
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::*;
-use rayon::prelude::*;
-use reqwest::blocking::Client;
+use futures::{stream, StreamExt};
 use std::{
     sync::{Arc, Mutex},
     time::Instant,
 };
 use tracing::debug;
 
-lazy_static::lazy_static! {
-    static ref CLIENT:Client = reqwest::blocking::Client::builder()
-    .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36")
-    .build().unwrap();
-}
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
+    let client = reqwest::Client::builder()
+        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36")
+        .build()
+        .unwrap();
 
-    // let url = "http://192.168.178.11:8083/";
     let url = "https://ascella.wtf/v2/ascella/view/zBNwf9q";
     let times = 5000;
     let started = Instant::now();
 
     let (success, failed) = (Arc::new(Mutex::new(0)), Arc::new(Mutex::new(0)));
 
-    (0..times).into_par_iter().for_each(|_| {
-        let (success_clone, failed_clone) = (Arc::clone(&success), Arc::clone(&failed));
-        let r = CLIENT.get(url).send();
-        match r {
-            Ok(r) => {
-                let mut suc = success_clone.lock().unwrap();
-                *suc += 1;
-                debug!("req s: {}", r.status().as_u16())
+    let urls = vec![url; times];
+    let bodies = stream::iter(urls)
+        .map(|url| {
+            let client = &client;
+            let (success_clone, failed_clone) = (Arc::clone(&success), Arc::clone(&failed));
+            async move {
+                let r = client.get(url).send().await;
+                match r {
+                    Ok(r) => {
+                        let mut suc = success_clone.lock().unwrap();
+                        *suc += 1;
+                        debug!("req s: {}", r.status().as_u16())
+                    }
+                    Err(e) => {
+                        let mut fail = failed_clone.lock().unwrap();
+                        *fail += 1;
+                        debug!("{e:?}")
+                    }
+                };
             }
-            Err(e) => {
-                let mut fail = failed_clone.lock().unwrap();
-                *fail += 1;
-                debug!("{e:?}")
-            }
-        };
-    });
+        })
+        .buffer_unordered(10);
+
+    bodies.for_each(|_| async {}).await;
+
     let (f, s) = (*failed.lock().unwrap(), *success.lock().unwrap());
     let now = Instant::now();
     let elapsed = now.duration_since(started);
