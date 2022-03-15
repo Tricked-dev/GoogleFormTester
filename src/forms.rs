@@ -7,6 +7,7 @@ use scraper::{Html, Selector};
 use serde_json::Value;
 use std::collections::HashMap;
 
+
 use crate::client::CLIENT;
 pub enum FieldType {
     ShortText = 0,
@@ -219,10 +220,13 @@ impl GoogleFormSpammer {
             .query(&params)
             .body(serde_json::to_string(&params).unwrap())
             .send()
-            .await
-            .unwrap();
-
-        let status = r.status();
-        status.is_success()
+            .await;
+        match r {
+            Ok(r) => {
+                let status = r.status();
+                status.is_success()
+            }
+            Err(_) => false,
+        }
     }
 }
