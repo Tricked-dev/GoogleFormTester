@@ -6,7 +6,7 @@ use rand::Rng;
 use scraper::{Html, Selector};
 use serde_json::Value;
 use std::collections::HashMap;
-
+use tracing::debug;
 
 use crate::client::CLIENT;
 pub enum FieldType {
@@ -224,6 +224,7 @@ impl GoogleFormSpammer {
         match r {
             Ok(r) => {
                 let status = r.status();
+                debug!("req s: {}", status.as_u16());
                 status.is_success()
             }
             Err(_) => false,

@@ -17,24 +17,24 @@ mod forms;
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
 struct Cli {
-    #[clap(short, long)]
     /// url to test on
+    #[clap(short, long)]
     url: String,
 
-    #[clap(short, long, default_value_t = 5000)]
     /// Amount of times to test
+    #[clap(short, long, default_value_t = 5000)]
     times: usize,
 
-    #[clap(short, long)]
     /// Weather or not this is a google form
+    #[clap(short, long)]
     google: bool,
 
-    #[clap(short, long)]
     /// Only do required parts with google forms.
+    #[clap(short, long)]
     required: bool,
 
+    /// Thread/Parallel count 50 recommended for fastest speeds
     #[clap(short, long, default_value_t = 8)]
-    // Thread count
     parallel: usize,
 }
 
@@ -42,7 +42,19 @@ struct Cli {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let begin = Instant::now();
     let cli = Cli::parse();
-    println!("[-] fetching {} for {} times", cli.url, cli.times);
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_FULL)
+        .set_content_arrangement(ContentArrangement::Dynamic)
+        .add_row(vec![Cell::new("URL"), Cell::new(&cli.url)])
+        .add_row(vec![Cell::new("Times"), Cell::new(&cli.times)])
+        .add_row(vec![Cell::new("Google Form"), Cell::new(&cli.google)])
+        .add_row(vec![Cell::new("Required Fields"), Cell::new(&cli.required)])
+        .add_row(vec![Cell::new("Parallel x"), Cell::new(&cli.parallel)]);
+
+    println!("{table}");
+    println!("[-] Started testing");
+
     tracing_subscriber::fmt::init();
 
     let spammer = if cli.google {
