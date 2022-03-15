@@ -218,7 +218,7 @@ impl GoogleFormSpammer {
         let r = CLIENT
             .post(&self.form_url)
             .query(&params)
-            .body(serde_json::to_string(&params).unwrap())
+            .header("content-length", "0")
             .send()
             .await;
         match r {
