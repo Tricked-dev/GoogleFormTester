@@ -11,6 +11,9 @@ This project is a rust rewrite of [GoogleFormSpammer](https://github.com/Illumin
 - Create mocking data for your google forms
 - Test your api's with 1k r/s
 
+![image](https://user-images.githubusercontent.com/72335827/158393970-2bfe5736-d750-4341-9c67-549498d4d628.png)
+
+
 ## 💥 Usage
 
 ```sh
