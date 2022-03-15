@@ -4,9 +4,9 @@ Test your form by creating mocking data
 
 ## 💳 Credits
 
-This project is a rust rewrite of [GoogleFormSpammer](https://github.com/IlluminatiFish/GoogleFormSpammer) by [IlluminatiFish](https://github.com/IlluminatiFish).
+This project is close to a rust rewrite of [GoogleFormSpammer](https://github.com/IlluminatiFish/GoogleFormSpammer) by [IlluminatiFish](https://github.com/IlluminatiFish).
 
-## Features
+## 🥇 Features
 
 - Create mocking data for your google forms
 - Test your api's with 1k r/s
@@ -33,6 +33,6 @@ OPTIONS:
     -V, --version                Print version information
 ```
 
-## Disclaimer
+## 🎏 Disclaimer
 
 I am not liable for any malicious activity when people use this program
