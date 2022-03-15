@@ -1,8 +1,11 @@
-use reqwest::Client;
+use std::time::Duration;
+use surf::Url;
+use surf::{Client, Config};
+
+// use reqwest::Client;
 
 lazy_static::lazy_static! {
-   pub static ref CLIENT: Client = reqwest::Client::builder()
-        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36")
-        .build()
-        .unwrap();
+   pub static ref CLIENT: Client = Config::new()
+    .set_timeout(Some(Duration::from_secs(5)))
+    .try_into().unwrap();
 }

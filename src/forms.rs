@@ -120,9 +120,9 @@ impl GoogleFormSpammer {
         }
     }
     pub async fn _scrape_form(&mut self) {
-        let response = CLIENT.get(&self.form_url).send().await.unwrap();
+        let mut response = CLIENT.get(&self.form_url).send().await.unwrap();
 
-        let data = Html::parse_document(&response.text().await.unwrap())
+        let data = Html::parse_document(&response.body_string().await.unwrap())
             .select(&Selector::parse("div").unwrap())
             .filter(|x| x.value().attr("jsmodel").is_some())
             .map(|div| {
@@ -217,14 +217,16 @@ impl GoogleFormSpammer {
         let params = self.generate_post_data(50);
         let r = CLIENT
             .post(&self.form_url)
-            .query(&params)
             .header("content-length", "0")
+            .query(&params)
+            .unwrap()
             .send()
             .await;
         match r {
             Ok(r) => {
                 let status = r.status();
-                debug!("req s: {}", status.as_u16());
+                dbg!(status);
+                debug!("req s: {:?}", status);
                 status.is_success()
             }
             Err(_) => false,

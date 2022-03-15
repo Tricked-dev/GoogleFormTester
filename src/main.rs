@@ -93,7 +93,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Ok(r) => {
                             let mut suc = success_clone.lock().unwrap();
                             *suc += 1;
-                            debug!("req s: {}", r.status().as_u16())
+                            debug!("req s: {:?}", r.status())
                         }
                         Err(e) => {
                             let mut fail = failed_clone.lock().unwrap();
