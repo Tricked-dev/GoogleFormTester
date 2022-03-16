@@ -1,6 +1,6 @@
 # Google Form Tester
 
-Test your form by creating mocking data
+Test your form by creating mocking data. Using a too high `p` flag can make it so google ratelimits you and doing too many requests while ratelimited can get you robot flagged.
 
 ## 💳 Credits
 
@@ -12,7 +12,6 @@ This project is close to a rust rewrite of [GoogleFormSpammer](https://github.co
 - Test your api's with 1k r/s
 
 ![image](https://user-images.githubusercontent.com/72335827/158393970-2bfe5736-d750-4341-9c67-549498d4d628.png)
-
 
 ## 💥 Usage
 
@@ -32,6 +31,8 @@ OPTIONS:
     -u, --url <URL>              url to test on
     -V, --version                Print version information
 ```
+
+Doing more than 3.8k req's can get you captcha flagged
 
 ## 🎏 Disclaimer
 
