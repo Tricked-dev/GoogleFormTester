@@ -1,8 +1,6 @@
-use std::time::Duration;
-use surf::Url;
 use surf::{Client, Config};
 
-// use reqwest::Client;
+use std::time::Duration;
 
 lazy_static::lazy_static! {
    pub static ref CLIENT: Client = Config::new()

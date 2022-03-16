@@ -121,8 +121,12 @@ impl GoogleFormSpammer {
         }
     }
     pub async fn _scrape_form(&mut self) {
-        let mut response = CLIENT.get(&self.form_url).send().await.unwrap();
-
+        let mut response = CLIENT
+            .get(&self.form_url)
+            .middleware(surf::middleware::Redirect::new(10))
+            .send()
+            .await
+            .unwrap();
         let data = Html::parse_document(&response.body_string().await.unwrap())
             .select(&Selector::parse("div").unwrap())
             .filter(|x| x.value().attr("jsmodel").is_some())
